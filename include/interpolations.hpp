@@ -16,6 +16,8 @@ public:
     void set_meshes(std::vector<std::string> files, std::string name);
     void set_active(int index);
 
+    void set_interpolation_factor(float interpolation_factor);
+
 protected:
     void wait();
     bool has_waited_enough();
@@ -23,6 +25,7 @@ protected:
     void go_up();
     void reset_wait_step();
     void advance_animation();
+    void update_increment();
 
 private:
     std::vector<Object3D> meshes;

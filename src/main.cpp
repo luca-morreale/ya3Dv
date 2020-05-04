@@ -16,9 +16,11 @@
 std::vector<Object3D> visible_objects;
 std::vector<AnimatedInterpolation> visible_interpolations;
 
+
 void open_file_callback(std::vector<std::string> &files, std::array<bool, 1000> &selected);
 void open_interpolation_callback(std::map<std::string, std::vector<std::string>> &files, std::array<bool, 1000> &selected);
-static void animate_interpolations();
+void animate_interpolations();
+void set_interpolations_level(float interpolation_factor);
 
 
 int main(int argc, char** argv)
@@ -53,6 +55,8 @@ int main(int argc, char** argv)
     UI::open_file_callback = open_file_callback;
     UI::open_interpolation_callback = open_interpolation_callback;
     UI::animate_interpolations = animate_interpolations;
+    UI::set_interpolations_level = set_interpolations_level;
+
 
     polyscope::show();
 
@@ -86,10 +90,16 @@ void open_interpolation_callback(std::map<std::string, std::vector<std::string>>
     }
 }
 
-static void animate_interpolations()
+void animate_interpolations()
 {
     for (uint i = 0; i < visible_interpolations.size(); i++) {
         visible_interpolations[i].animate();
     }
+}
 
+void set_interpolations_level(float interpolation_factor)
+{
+    for (uint i = 0; i < visible_interpolations.size(); i++) {
+        visible_interpolations[i].set_interpolation_factor(interpolation_factor);
+    }
 }

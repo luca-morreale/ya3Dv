@@ -6,6 +6,7 @@ namespace UI {
     std::function<void(std::vector<std::string>&, std::array<bool, 1000>&)> open_file_callback;
     std::function<void(std::map<std::string, std::vector<std::string>>&, std::array<bool, 1000>&)> open_interpolation_callback;
     std::function<void()> animate_interpolations;
+    std::function<void(float)> set_interpolations_level;
 
     void callback()
     {
@@ -46,8 +47,13 @@ namespace UI {
 
     void interpolation_ui(ImVec2 &pos)
     {
-        // TODO fix ticks by hand
-        ImGui::SliderFloat("Interpolation Factor", &interpolation_slider, SLIDER_MIN, SLIDER_MAX);
+        // check value is changed
+        if (ImGui::SliderFloat("Interpolation Factor", &interpolation_slider, SLIDER_MIN, SLIDER_MAX)) {
+            // TODO fix ticks by hand
+            if (!animate) {
+                set_interpolations_level(interpolation_slider);
+            }
+        }
 
         if (ImGui::Button("Animate")) {
             animate = true;

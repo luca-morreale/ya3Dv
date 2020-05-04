@@ -48,6 +48,7 @@ namespace UI {
     extern std::function<void(std::vector<std::string>&, std::array<bool, 1000>&)> open_file_callback;
     extern std::function<void(std::map<std::string, std::vector<std::string>>&, std::array<bool, 1000>&)> open_interpolation_callback;
     extern std::function<void()> animate_interpolations;
+    extern std::function<void(float)> set_interpolations_level;
 
     void callback();
 

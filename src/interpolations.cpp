@@ -18,6 +18,19 @@ void AnimatedInterpolation::draw()
     this->meshes[this->current_active].draw();
 }
 
+void AnimatedInterpolation::set_interpolation_factor(float interpolation_factor)
+{
+    float step_size = 1.0 / (float)this->num_meshes;
+    int mesh_idx    = (int) (interpolation_factor / step_size);
+    mesh_idx = std::min(mesh_idx, this->num_meshes-1);
+
+    if (this->current_active != mesh_idx) {
+        this->current_active = mesh_idx;
+        this->draw();
+        this->update_increment();
+    }
+}
+
 void AnimatedInterpolation::animate()
 {
     this->draw();
@@ -57,7 +70,11 @@ void AnimatedInterpolation::reset_wait_step()
 void AnimatedInterpolation::advance_animation()
 {
     this->current_active += increment;
+    this->update_increment();
+}
 
+void AnimatedInterpolation::update_increment()
+{
     if (this->current_active == this->num_meshes-1) {
         this->go_down();
     } else if (this->current_active == 0) {
