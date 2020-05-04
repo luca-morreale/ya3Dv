@@ -1,14 +1,17 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 
+#include <vector>
+#include <array>
+
+#include <args/args.hxx>
 #include <polyscope/polyscope.h>
 
 #include "object_3d.hpp"
 #include "window_ui.hpp"
 #include "interpolations.hpp"
 
-#include <vector>
-#include <array>
+
 
 std::vector<Object3D> visible_objects;
 std::vector<AnimatedInterpolation> visible_interpolations;
@@ -18,7 +21,31 @@ void open_interpolation_callback(std::map<std::string, std::vector<std::string>>
 static void animate_interpolations();
 
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
+    // parse args
+    args::ArgumentParser parser("Visualizer for 3D meshes and point cloud.");
+    args::HelpFlag help(parser, "help", "Display this help menu", {'h', "help"});
+    args::Flag conformal(parser, "conformal", "Compute conformal measure", {'c', "conformal"});
+
+    try {
+        parser.ParseCLI(argc, argv);
+        if (conformal) {
+            Object3D::compute_conformal = true;
+        } else {
+            Object3D::compute_conformal = false;
+        }
+    } catch (const args::Help&) {
+        std::cout << parser;
+        return 0;
+    } catch (const args::ParseError& e) {
+        std::cerr << e.what() << std::endl;
+        std::cerr << parser;
+        return 1;
+    }
+
+
+    // visualization
 
     polyscope::init();
 

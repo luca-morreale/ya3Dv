@@ -43,6 +43,7 @@ public:
 
     bool is_mesh();
 
+    static bool compute_conformal;
 
 protected:
     void load_file();

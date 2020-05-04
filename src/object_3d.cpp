@@ -1,6 +1,7 @@
 
 #include "object_3d.hpp"
 
+bool Object3D::compute_conformal;
 
 Object3D::Object3D(std::string path) : path(path)
 {
@@ -82,15 +83,18 @@ void Object3D::draw_point_cloud()
 void Object3D::draw_mesh()
 {
     polyscope::registerSurfaceMesh(this->name, this->points, this->faces);
-    polyscope::getSurfaceMesh(this->name)->addFaceScalarQuantity("F conformality", this->f_conformality);
-    polyscope::getSurfaceMesh(this->name)->addFaceScalarQuantity("F shrinkage", this->f_shrinkage);
-    polyscope::getSurfaceMesh(this->name)->addFaceVectorQuantity("F normals", this->f_normals);
+    // polyscope::getSurfaceMesh(this->name)->addFaceVectorQuantity("F normals", this->f_normals);
     polyscope::getSurfaceMesh(this->name)->addVertexColorQuantity("V random color", this->v_rand_colors);
-    polyscope::getSurfaceMesh(this->name)->addVertexScalarQuantity("G curvature", this->v_curv, polyscope::DataType::MAGNITUDE);
-    polyscope::getSurfaceMesh(this->name)->addVertexVectorQuantity("V normals", this->v_normals);
+    // polyscope::getSurfaceMesh(this->name)->addVertexScalarQuantity("G curvature", this->v_curv, polyscope::DataType::MAGNITUDE);
+    // polyscope::getSurfaceMesh(this->name)->addVertexVectorQuantity("V normals", this->v_normals);
 
     if (this->has_texture) {
         polyscope::getSurfaceMesh(this->name)->addVertexParameterizationQuantity("Parameterization", this->text_points);
+    }
+
+    if (this->f_conformality.size() > 0){
+        polyscope::getSurfaceMesh(this->name)->addFaceScalarQuantity("F conformality", this->f_conformality);
+        // polyscope::getSurfaceMesh(this->name)->addFaceScalarQuantity("F shrinkage", this->f_shrinkage);
     }
 
 }
@@ -119,9 +123,6 @@ void Object3D::compute_mesh_property()
     Eigen::MatrixXd N_vertices;
     Eigen::MatrixXd N_faces;
     Eigen::VectorXd K;
-    Eigen::VectorXd conformality(this->faces.size());
-    Eigen::VectorXd shrinkage(this->faces.size());
-
 
     // Compute per-face normals
     igl::per_face_normals(V, F, N_faces);
@@ -129,8 +130,6 @@ void Object3D::compute_mesh_property()
     igl::per_vertex_normals(V, F, N_vertices);
     // Compute integral of Gaussian curvature
     igl::gaussian_curvature(V, F, K);
-
-    this->compute_mesh_conformality(V, T, conformality, shrinkage);
 
     // transfer data in parallel
     #pragma omp parallel sections
@@ -141,11 +140,22 @@ void Object3D::compute_mesh_property()
         convert_vector(N_vertices, this->v_normals);
         #pragma omp section
         convert_vector(K, this->v_curv);
-        #pragma omp section
-        convert_vector(conformality, this->f_conformality);
-        #pragma omp section
-        convert_vector(shrinkage, this->f_shrinkage);
     }
+
+    if (Object3D::compute_conformal){
+        Eigen::VectorXd conformality(this->faces.size());
+        Eigen::VectorXd shrinkage(this->faces.size());
+        this->compute_mesh_conformality(V, T, conformality, shrinkage);
+        // transfer data in parallel
+        #pragma omp parallel sections
+        {
+            #pragma omp section
+            convert_vector(conformality, this->f_conformality);
+            #pragma omp section
+            convert_vector(shrinkage, this->f_shrinkage);
+        }
+    }
+
 }
 
 void Object3D::compute_mesh_conformality(Eigen::MatrixXd &V, Eigen::MatrixXd &T,
