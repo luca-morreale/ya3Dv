@@ -48,10 +48,7 @@ namespace io {
 } // namespace polyscope
 
 
-void load_OBJ(std::string filename,
-                std::vector<std::array<double, 3>> &vertexPositionsOut,
-                std::vector<std::vector<size_t>> &faceIndicesOut,
-                std::vector<std::array<double, 2>> &texturePositionsOut)
+void load_OBJ(std::string filename, Data3DPtr data)
 {
     // Open the file
     std::ifstream in(filename);
@@ -60,12 +57,10 @@ void load_OBJ(std::string filename,
     // create temporary variables
     std::map<size_t, size_t> textureVertMapping;
     std::vector<std::array<double, 2>> tmpTextPositions;
+    std::vector<std::array<double, 3>> tmpVertexPositions;
 
-    // reset output containers
-    faceIndicesOut.clear();
-    vertexPositionsOut.clear();
-    texturePositionsOut.clear();
-
+    // reset data containers
+    data->faceIndices.clear();
 
     // parse obj format
     std::string line;
@@ -78,7 +73,7 @@ void load_OBJ(std::string filename,
         if (token == "v") {         // vertex
             double x, y, z;
             ss >> x >> y >> z;
-            vertexPositionsOut.push_back({{x, y, z}});
+            tmpVertexPositions.push_back({{x, y, z}});
 
         } else if (token == "vt") { // texture vertex
             double u, v;
@@ -103,24 +98,77 @@ void load_OBJ(std::string filename,
                 textureVertMapping[index.uv] = index.position;
             }
 
-            faceIndicesOut.push_back(face);
+            data->faceIndices.push_back(face);
         }
     }
 
-    texturePositionsOut.resize(vertexPositionsOut.size());
+    data->textureCoords.resize(tmpVertexPositions.size());
     for (auto it = textureVertMapping.begin(); it != textureVertMapping.end(); it++) {
-        texturePositionsOut[it->second] = tmpTextPositions[it->first];
+        data->textureCoords[it->second] = tmpTextPositions[it->first];
     }
+
+    data->set_vertices(tmpVertexPositions);
 
 }
 
 
-void loadPolygonSoup(std::string filename,
-                    std::vector<glm::vec3> &vertexPositionsOut,
-                    std::vector<std::vector<size_t>> &faceIndicesOut,
-                    std::vector<std::array<double, 2>> &texturePositionsOut)
+void load_PLY(std::string filename, Data3DPtr data)
 {
+    // Construct a data object by reading from file
+    happly::PLYData plyIn(filename);
 
+    // Get mesh-style data from the object
+    std::vector<std::array<double, 3>> tmpVertexPositions = plyIn.getVertexPositions();
+    data->set_vertices(tmpVertexPositions);
+    data->faceIndices = plyIn.getFaceIndices<size_t>();
+
+    // extract vertices attributes
+    std::vector<std::string> propNames = plyIn.getElement("vertex").getPropertyNames();
+
+    propNames.erase(std::remove(propNames.begin(), propNames.end(), std::string("x")), propNames.end());
+    propNames.erase(std::remove(propNames.begin(), propNames.end(), std::string("y")), propNames.end());
+    propNames.erase(std::remove(propNames.begin(), propNames.end(), std::string("z")), propNames.end());
+
+    for (std::string name : propNames)
+    {
+        std::vector<double> propData = plyIn.getElement("vertex").getProperty<double>(name.c_str());
+        data->vertexAttributes[name] = propData;
+    }
+
+    // Fill in texture coords from attributes
+    // has texture coords in s and t
+    if (data->vertexAttributes.find("s") != data->vertexAttributes.end() &&
+            data->vertexAttributes.find("t") != data->vertexAttributes.end())
+    {
+        data->textureCoords.resize(data->vertexAttributes["s"].size());
+        for (uint i = 0; i < data->vertexAttributes["s"].size(); i++)
+        {
+            data->textureCoords[i] = { data->vertexAttributes["s"][i], data->vertexAttributes["s"][i] };
+        }
+
+    // has texture coords in texture_u and texture_v
+    } else if (data->vertexAttributes.find("texture_u") != data->vertexAttributes.end() &&
+                data->vertexAttributes.find("texture_v") != data->vertexAttributes.end())
+    {
+        data->textureCoords.resize(data->vertexAttributes["texture_u"].size());
+        for (uint i = 0; i < data->vertexAttributes["texture_u"].size(); i++)
+        {
+            data->textureCoords[i] = { data->vertexAttributes["texture_u"][i],
+                                        data->vertexAttributes["texture_u"][i] };
+        }
+    }
+
+    data->vertexAttributes.erase("s");
+    data->vertexAttributes.erase("t");
+    data->vertexAttributes.erase("texture_u");
+    data->vertexAttributes.erase("texture_v");
+
+    // face attributes
+}
+
+
+void loadPolygonSoup(std::string filename, Data3DPtr data)
+{
     // Check if file exists
     std::ifstream testStream(filename);
     if (!testStream) {
@@ -139,19 +187,13 @@ void loadPolygonSoup(std::string filename,
         std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
     }
 
-    std::vector<std::array<double, 3>> vertices;
-
     if (extension == "obj") {
-        load_OBJ(filename, vertices, faceIndicesOut, texturePositionsOut);
+        load_OBJ(filename, data);
     } else if (extension == "ply") {
-        polyscope::loadPolygonSoup_PLY(filename, vertices, faceIndicesOut);
+        // polyscope::loadPolygonSoup_PLY(filename, vertices, faceIndicesOut);
+        load_PLY(filename, data);
     } else {
         polyscope::error("Could not detect file type to load mesh from " + filename);
-    }
-
-    vertexPositionsOut.clear();
-    for (uint i = 0; i < vertices.size(); i++) {
-        vertexPositionsOut.push_back(glm::vec3(vertices[i][0], vertices[i][1], vertices[i][2]));
     }
 
 }

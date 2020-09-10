@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <array>
+#include <memory>
 
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
@@ -14,17 +15,8 @@
 #include <polyscope/surface_mesh.h>
 #include <polyscope/surface_mesh_io.h>
 
-#include <igl/gaussian_curvature.h>
-#include <igl/per_vertex_normals.h>
-#include <igl/per_face_normals.h>
-#include <igl/cotmatrix.h>
-#include <igl/massmatrix.h>
-#include <igl/eigs.h>
-#include <igl/slice.h>
-#include <igl/slice_into.h>
-
-
 #include "mesh_io.hpp"
+#include "data3d.hpp"
 
 class Object3D {
 
@@ -41,38 +33,27 @@ public:
     void set_vertices_random_colors(std::vector<std::array<double, 3>> &rand_colors);
     std::vector<std::array<double, 3>> get_vertices_random_colors();
 
+    void set_faces_random_colors(std::vector<std::array<double, 3>> &rand_colors);
+    std::vector<std::array<double, 3>> get_faces_random_colors();
+
     bool is_mesh();
 
     static bool compute_conformal;
 
 protected:
     void load_file();
-    void compute_mesh_property();
-    void compute_mesh_conformality(Eigen::MatrixXd &V, Eigen::MatrixXd &T,
-                                    Eigen::VectorXd &conformality, Eigen::VectorXd &shrinkage);
 
     void generate_random_colors();
 
-    Eigen::MatrixXd eigen_points();
-    Eigen::MatrixXd eigen_texture();
-    Eigen::MatrixXi eigen_faces();
-    void convert_vector(Eigen::MatrixXd &input_data, std::vector<glm::vec3> &vector);
-    void convert_vector(Eigen::VectorXd &input_data, std::vector<double> &vector);
 
 private:
     std::string path;
     std::string name;
 
-    std::vector<glm::vec3> points;
-    std::vector<std::vector<size_t>> faces;
-    std::vector<std::array<double, 2>> text_points;
+    Data3DPtr data;
 
-    std::vector<glm::vec3> v_normals;
-    std::vector<glm::vec3> f_normals;
     std::vector<std::array<double, 3>> v_rand_colors;
-    std::vector<double> v_curv;
-    std::vector<double> f_conformality;
-    std::vector<double> f_shrinkage;
+    std::vector<std::array<double, 3>> f_rand_colors;
 
     bool has_faces;
     bool has_texture;

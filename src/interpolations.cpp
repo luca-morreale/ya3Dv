@@ -91,10 +91,10 @@ void AnimatedInterpolation::set_meshes(std::vector<std::string> files, std::stri
         this->meshes.push_back(Object3D(file, name));
     }
 
-    auto rand_colors = this->meshes[0].get_vertices_random_colors();
+    auto rand_colors = this->meshes[0].get_faces_random_colors();
 
     for (uint i = 0; i < files.size(); i++) {
-        this->meshes[i].set_vertices_random_colors(rand_colors);
+        this->meshes[i].set_faces_random_colors(rand_colors);
     }
 
     this->current_active = 0;

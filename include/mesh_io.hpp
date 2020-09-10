@@ -10,18 +10,18 @@
 #include <sstream>
 #include <string>
 
+#include "happly/happly.h"
+
 #include <polyscope/surface_mesh_io.h>
 #include <polyscope/messages.h>
 
-void load_OBJ(std::string filename,
-            std::vector<std::array<double, 3>> &vertexPositionsOut,
-            std::vector<std::vector<size_t>> &faceIndicesOut,
-            std::vector<std::array<double, 2>> &texturePositionsOut);
+#include "data3d.hpp"
 
-void loadPolygonSoup(std::string filename,
-                    std::vector<glm::vec3> &vertexPositionsOut,
-                    std::vector<std::vector<size_t>> &faceIndicesOut,
-                    std::vector<std::array<double, 2>> &texturePositionsOut);
+void load_OBJ(std::string filename, Data3DPtr data);
+
+void load_PLY(std::string filename, Data3DPtr data);
+
+void loadPolygonSoup(std::string filename, Data3DPtr data);
 
 
 #endif // LOAD_OBJ_HPP_
