@@ -143,7 +143,7 @@ void load_PLY(std::string filename, Data3DPtr data)
         data->textureCoords.resize(data->vertexAttributes["s"].size());
         for (uint i = 0; i < data->vertexAttributes["s"].size(); i++)
         {
-            data->textureCoords[i] = { data->vertexAttributes["s"][i], data->vertexAttributes["s"][i] };
+            data->textureCoords[i] = { data->vertexAttributes["s"][i], data->vertexAttributes["t"][i] };
         }
 
     // has texture coords in texture_u and texture_v
@@ -154,7 +154,7 @@ void load_PLY(std::string filename, Data3DPtr data)
         for (uint i = 0; i < data->vertexAttributes["texture_u"].size(); i++)
         {
             data->textureCoords[i] = { data->vertexAttributes["texture_u"][i],
-                                        data->vertexAttributes["texture_u"][i] };
+                                        data->vertexAttributes["texture_v"][i] };
         }
     }
 
