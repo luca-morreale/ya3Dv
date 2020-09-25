@@ -3,9 +3,9 @@
 
 namespace UI {
 
-    // std::function<void(std::vector<std::string>&, std::array<bool, 1000>&)> open_file_callback;
     std::function<void(std::vector<std::string>&)> open_file_callback;
-    std::function<void(std::map<std::string, std::vector<std::string>>&, std::array<bool, 1000>&)> open_interpolation_callback;
+    std::function<void(std::map<std::string, std::vector<std::string>>&, 
+                    std::array<bool, 1000>&)> open_interpolation_callback;
     std::function<void()> animate_interpolations;
     std::function<void(float)> set_interpolations_level;
 
@@ -25,8 +25,7 @@ namespace UI {
         }
         ImGui::SameLine();
         if (ImGui::Button("Open File")) {
-            open_file = true;
-            fileDialogOpen = true;
+            FileDialog::OpenFileDialog(true);
         }
 
         ImGui::SameLine();
@@ -36,9 +35,8 @@ namespace UI {
 
         ImGui::PopItemWidth();
 
-        if (open_file) {
-            open_file_ui(pos);
-        } else if (open_interpolation) {
+        open_file_ui(pos);
+        if (open_interpolation) {
             open_interpolation_ui(pos);
         }
 
@@ -70,48 +68,20 @@ namespace UI {
 
     void open_file_ui(ImVec2 &pos)
     {
-        // ImGui::SetNextWindowPos(ImVec2(pos[0], pos[1] + MAIN_FRAME_HEIGHT + INTERPOLATION_FRAME_HEIGHT));
-        // ImGui::SetNextWindowSize(ImVec2(WINDOW_WIDTH, 0));
-
-        // static bool windowOpen = true;
-        // ImGui::Begin("Open File");
-        // ImGui::PushItemWidth(OPEN_FRAME_WIDTH);
-
-        // folders_selection_ui();
-
-        // files_selection_ui();
-
-
-        // if (ImGui::Button("Select")) {
-        //     open_file_callback(files, selected_files);
-        //     clear_cache();
-        // }
-        // ImGui::SameLine();
-        // if (ImGui::Button("Cancel")) {
-        //     clear_cache();
-        // }
-
-        // ImGui::End();
-
 
         std::vector<std::string> selection;
-        if (fileDialogOpen) {
-            ShowFileDialog(selection);
+        if (FileDialog::IsFileDialogOpen()) {
+            FileDialog::ShowFileDialog(selection);
         }
 
         open_file_callback(selection);
-
-        // if (selection.size() > 0) {
-        //     for (uint i = 0; i < selection.size(); i++) {
-        //         std::cout << selection[i] << std::endl;
-        //     }
-        // }
 
     }
 
     void open_interpolation_ui(ImVec2 &pos)
     {
-        ImGui::SetNextWindowPos(ImVec2(pos[0], pos[1] + MAIN_FRAME_HEIGHT + INTERPOLATION_FRAME_HEIGHT));
+        ImGui::SetNextWindowPos(ImVec2(pos[0], 
+                        pos[1] + MAIN_FRAME_HEIGHT + INTERPOLATION_FRAME_HEIGHT));
         ImGui::SetNextWindowSize(ImVec2(WINDOW_WIDTH, 0));
 
         static bool windowOpen = true;
@@ -163,7 +133,8 @@ namespace UI {
             populate_files();
             for (uint i = 0; i < files.size(); i++) {
                 // remove folder name from visible path
-                std::string name = files[i].substr(folders[selected_folder].length()+1, files[i].length());
+                std::string name = files[i].substr(folders[selected_folder].length()+1,
+                                        files[i].length());
                 ImGui::Selectable(name.c_str(), &selected_files[i]);
             }
             ImGui::ListBoxFooter();
@@ -240,7 +211,8 @@ namespace UI {
      */
     bool is_animatable_file(std::string file_path)
     {
-        return file_path.find('[') != std::string::npos && file_path.find(']') != std::string::npos;
+        return file_path.find('[') != std::string::npos && 
+                file_path.find(']') != std::string::npos;
     }
 
     std::string extract_interpolation_key(std::string file_path)
