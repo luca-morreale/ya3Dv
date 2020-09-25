@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.10.2)
 
 # Maybe stop from CMAKEing in the wrong place
 if (CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
@@ -20,7 +20,9 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS 1 ) # Emit a compile flags file to support co
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   # using Clang (linux or apple) or GCC
   message("Using clang/gcc compiler flags")
-  SET(BASE_CXX_FLAGS "-std=c++11 -Wall -Wextra -Werror -g3")
+  set(CMAKE_CXX_STANDARD 17)
+  set(CMAKE_CXX_STANDARD_REQUIRED ON)
+  SET(BASE_CXX_FLAGS "-std=c++17 -lstdc++fs -Wall -Wextra -Werror -g3")
   SET(DISABLED_WARNINGS " -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-deprecated-declarations -Wno-missing-braces")
   SET(TRACE_INCLUDES " -H -Wno-error=unused-command-line-argument")
 
@@ -59,6 +61,7 @@ else()
   # unrecognized
   message( FATAL_ERROR "Unrecognized compiler [${CMAKE_CXX_COMPILER_ID}]" )
 endif()
+
 
 # --------------------------------------------------------------
 
@@ -104,6 +107,7 @@ set(LIBS ${POLYSCOPE_LIB}
         ${CMAKE_DL_LIBS}
 
         ${Boost_LIBRARIES}
+        stdc++fs
     )
 
 # --------------------------------------------------------------
@@ -127,6 +131,7 @@ SET(SRCS src/object_3d.cpp
         src/filesystem.cpp
         src/interpolations.cpp
         src/mesh_io.cpp
+        src/L2DFileDialog.cpp
         )
 
 # --------------------------------------------------------------
