@@ -1,5 +1,5 @@
 
-#include "L2DFileDialog.hpp"
+#include "file_dialog.hpp"
 
 namespace UI {
 

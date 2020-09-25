@@ -110,19 +110,6 @@ set(LIBS ${POLYSCOPE_LIB}
         stdc++fs
     )
 
-# --------------------------------------------------------------
-
-
-
-# Create an executable
-add_executable(
-        polyscopedemo
-        src/demo_app.cpp
-        )
-
-# Link settings
-target_link_libraries(polyscopedemo ${LIBS} )
-
 # --------------------- Visualizer FILES -----------------------
 
 SET(SRCS src/object_3d.cpp
@@ -131,7 +118,7 @@ SET(SRCS src/object_3d.cpp
         src/filesystem.cpp
         src/interpolations.cpp
         src/mesh_io.cpp
-        src/L2DFileDialog.cpp
+        src/file_dialog.cpp
         )
 
 # --------------------------------------------------------------
