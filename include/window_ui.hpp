@@ -12,6 +12,8 @@
 
 #include "filesystem.hpp"
 
+#include "L2DFileDialog.hpp"
+
 namespace UI {
 
     // UI interface
@@ -45,7 +47,7 @@ namespace UI {
     static std::array<bool, 1000> selected_interpolations;
 
 
-    extern std::function<void(std::vector<std::string>&, std::array<bool, 1000>&)> open_file_callback;
+    extern std::function<void(std::vector<std::string>&)> open_file_callback;
     extern std::function<void(std::map<std::string, std::vector<std::string>>&, std::array<bool, 1000>&)> open_interpolation_callback;
     extern std::function<void()> animate_interpolations;
     extern std::function<void(float)> set_interpolations_level;
@@ -68,6 +70,8 @@ namespace UI {
 
     bool is_animatable_file(std::string file_path);
     std::string extract_interpolation_key(std::string file_path);
+
+
 }
 
 

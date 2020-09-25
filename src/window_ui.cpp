@@ -3,7 +3,8 @@
 
 namespace UI {
 
-    std::function<void(std::vector<std::string>&, std::array<bool, 1000>&)> open_file_callback;
+    // std::function<void(std::vector<std::string>&, std::array<bool, 1000>&)> open_file_callback;
+    std::function<void(std::vector<std::string>&)> open_file_callback;
     std::function<void(std::map<std::string, std::vector<std::string>>&, std::array<bool, 1000>&)> open_interpolation_callback;
     std::function<void()> animate_interpolations;
     std::function<void(float)> set_interpolations_level;
@@ -25,7 +26,9 @@ namespace UI {
         ImGui::SameLine();
         if (ImGui::Button("Open File")) {
             open_file = true;
+            fileDialogOpen = true;
         }
+
         ImGui::SameLine();
         if (ImGui::Button("Open Interpolation")) {
             open_interpolation = true;
@@ -67,28 +70,43 @@ namespace UI {
 
     void open_file_ui(ImVec2 &pos)
     {
-        ImGui::SetNextWindowPos(ImVec2(pos[0], pos[1] + MAIN_FRAME_HEIGHT + INTERPOLATION_FRAME_HEIGHT));
-        ImGui::SetNextWindowSize(ImVec2(WINDOW_WIDTH, 0));
+        // ImGui::SetNextWindowPos(ImVec2(pos[0], pos[1] + MAIN_FRAME_HEIGHT + INTERPOLATION_FRAME_HEIGHT));
+        // ImGui::SetNextWindowSize(ImVec2(WINDOW_WIDTH, 0));
 
-        static bool windowOpen = true;
-        ImGui::Begin("Open File");
-        ImGui::PushItemWidth(OPEN_FRAME_WIDTH);
+        // static bool windowOpen = true;
+        // ImGui::Begin("Open File");
+        // ImGui::PushItemWidth(OPEN_FRAME_WIDTH);
 
-        folders_selection_ui();
+        // folders_selection_ui();
 
-        files_selection_ui();
+        // files_selection_ui();
 
 
-        if (ImGui::Button("Select")) {
-            open_file_callback(files, selected_files);
-            clear_cache();
+        // if (ImGui::Button("Select")) {
+        //     open_file_callback(files, selected_files);
+        //     clear_cache();
+        // }
+        // ImGui::SameLine();
+        // if (ImGui::Button("Cancel")) {
+        //     clear_cache();
+        // }
+
+        // ImGui::End();
+
+
+        std::vector<std::string> selection;
+        if (fileDialogOpen) {
+            ShowFileDialog(selection);
         }
-        ImGui::SameLine();
-        if (ImGui::Button("Cancel")) {
-            clear_cache();
-        }
 
-        ImGui::End();
+        open_file_callback(selection);
+
+        // if (selection.size() > 0) {
+        //     for (uint i = 0; i < selection.size(); i++) {
+        //         std::cout << selection[i] << std::endl;
+        //     }
+        // }
+
     }
 
     void open_interpolation_ui(ImVec2 &pos)

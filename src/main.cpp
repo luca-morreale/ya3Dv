@@ -17,7 +17,7 @@ std::vector<Object3D> visible_objects;
 std::vector<AnimatedInterpolation> visible_interpolations;
 
 
-void open_file_callback(std::vector<std::string> &files, std::array<bool, 1000> &selected);
+void open_file_callback(std::vector<std::string> &files);
 void open_interpolation_callback(std::map<std::string, std::vector<std::string>> &files, std::array<bool, 1000> &selected);
 void animate_interpolations();
 void set_interpolations_level(float interpolation_factor);
@@ -64,21 +64,18 @@ int main(int argc, char** argv)
 }
 
 
-void open_file_callback(std::vector<std::string> &files, std::array<bool, 1000> &selected)
+void open_file_callback(std::vector<std::string> &files)
 {
     for (uint i = 0; i < files.size(); i++) {
-        if (selected[i]) {
-            Object3D obj(files[i]);
-            obj.draw();
-            visible_objects.push_back(obj);
-        }
+        Object3D obj(files[i]);
+        obj.draw();
+        visible_objects.push_back(obj);
     }
 }
 
 
 void open_interpolation_callback(std::map<std::string, std::vector<std::string>> &files, std::array<bool, 1000> &selected)
 {
-    // TODO fill this
     int i = 0;
     for (auto it = files.begin(); it != files.end(); it++) {
         if (selected[i]) {
