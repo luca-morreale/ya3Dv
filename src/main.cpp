@@ -28,15 +28,12 @@ int main(int argc, char** argv)
     // parse args
     args::ArgumentParser parser("Visualizer for 3D meshes and point cloud.");
     args::HelpFlag help(parser, "help", "Display this help menu", {'h', "help"});
-    args::Flag conformal(parser, "conformal", "Compute conformal measure", {'c', "conformal"});
+    args::PositionalList<std::string> files(parser, "files", "One or more files to visualize");
+    // args::Flag conformal(parser, "conformal", "Compute conformal measure", {'c', "conformal"});
 
     try {
         parser.ParseCLI(argc, argv);
-        if (conformal) {
-            Object3D::compute_conformal = true;
-        } else {
-            Object3D::compute_conformal = false;
-        }
+        
     } catch (const args::Help&) {
         std::cout << parser;
         return 0;
@@ -46,9 +43,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-
     // visualization
-
     polyscope::init();
 
     polyscope::state::userCallback = UI::callback;
@@ -57,6 +52,11 @@ int main(int argc, char** argv)
     UI::animate_interpolations = animate_interpolations;
     UI::set_interpolations_level = set_interpolations_level;
 
+    
+    std::vector<std::string> files_list = files.Get();
+    if (files_list.size() > 0) {
+        open_file_callback(files_list);
+    }
 
     polyscope::show();
 
