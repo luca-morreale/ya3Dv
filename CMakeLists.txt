@@ -1,3 +1,4 @@
+project(ya3Dv)
 cmake_minimum_required(VERSION 3.10.2)
 
 # Maybe stop from CMAKEing in the wrong place
@@ -127,10 +128,10 @@ SET(SRCS src/object_3d.cpp
 # ---------------------- Visualizer ----------------------------
 
 # Create an executable
-add_executable(visualizer src/main.cpp ${SRCS} )
+add_executable(${PROJECT_NAME} src/main.cpp ${SRCS} )
 
 # Link settings
-target_link_libraries(visualizer ${LIBS} )
+target_link_libraries(${PROJECT_NAME} ${LIBS} )
 
 # --------------------------------------------------------------
 
