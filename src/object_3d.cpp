@@ -88,6 +88,16 @@ void Object3D::draw_point_cloud()
 {
     polyscope::registerPointCloud(this->name, this->data->vertices);
     polyscope::getPointCloud(this->name)->addColorQuantity("V random color", this->v_rand_colors);
+
+    for (auto attribute : this->data->vertexAttributes)
+    {
+        polyscope::getPointCloud(this->name)->addScalarQuantity(attribute.first.c_str(), attribute.second);
+    }
+
+    for (auto attribute : this->data->vertexVecAttributes)
+    {
+        polyscope::getPointCloud(this->name)->addVectorQuantity(attribute.first.c_str(), attribute.second);
+    }
 }
 
 void Object3D::draw_mesh()

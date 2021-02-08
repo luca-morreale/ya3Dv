@@ -10,12 +10,15 @@
 #include <sstream>
 #include <string>
 
-#include "happly/happly.h"
+#include <csv/csv.hpp>
+#include <happly/happly.h>
 
 #include <polyscope/surface_mesh_io.h>
 #include <polyscope/messages.h>
 
 #include "data3d.hpp"
+
+void load_PTS(std::string filename, Data3DPtr data);
 
 void load_OBJ(std::string filename, Data3DPtr data);
 

@@ -48,6 +48,87 @@ namespace io {
 } // namespace polyscope
 
 
+void load_PTS(std::string filename, Data3DPtr data)
+{
+    // create temporary container for data
+    std::vector<std::array<double, 3>> tmpVertexPositions;
+    std::unordered_map<std::string, std::vector<double>> attributes;
+    std::unordered_map<std::string, std::vector<std::array<double, 3>> > vecAttributes;
+
+    csv::CSVFormat format;
+    format.delimiter(' ').header_row(0);   // Header is on first row
+
+    // open file
+    csv::CSVReader reader(filename, format);
+    // get column names
+    std::vector<std::string> names = reader.get_col_names();
+
+    // parse names
+    std::unordered_map<std::string, std::string> name_to_key;
+    std::unordered_map<std::string, bool> name_is_vector;
+    std::unordered_map<std::string, int> name_to_col;
+
+    for (std::string name : names) {
+
+        // parse vector attribute
+        if (name.rfind("vector_", 0) == 0) {
+
+            // extract real key from col name
+            std::string key = name.substr(7, name.size()-9);
+
+            name_to_key[name] = key;
+            name_is_vector[name] = true;
+            name_to_col[name] = 0;
+            if (name[name.size()-1] == 'y') {
+               name_to_col[name] = 1;
+            } else if (name[name.size()-1] == 'z') {
+                name_to_col[name] = 2;
+            }
+            vecAttributes[key] = std::vector<std::array<double, 3>>();
+
+        } else {// parse scalar attribute
+            name_to_key[name] = name;
+            name_is_vector[name] = false;
+            attributes[name] = std::vector<double>();
+        }
+    }
+
+    // iterate over rows to save data
+    for (csv::CSVRow& row: reader) {
+        double x = row["x"].get<double>();
+        double y = row["y"].get<double>();
+        double z = row["z"].get<double>();
+        tmpVertexPositions.push_back({{x, y, z}});
+        int i = tmpVertexPositions.size() - 1;
+
+        for (std::string name : names) {
+
+            // parse vector attribute
+            if (name_is_vector[name]) {
+
+                // extract real key from col name
+                std::string key = name_to_key[name];
+
+                // if vector row does not exist, create it
+                if (vecAttributes[key].size() < tmpVertexPositions.size()) {
+                    vecAttributes[key].push_back({{0, 0, 0}});
+                }
+
+                int c = name_to_col[name];
+                vecAttributes[key][i][c] = row[name].get<double>();
+
+            } else {// parse scalar attribute
+                attributes[name].push_back(row[name].get<double>());
+            }
+        }
+    }
+
+    data->set_vertices(tmpVertexPositions);
+    data->vertexVecAttributes = vecAttributes;
+    data->vertexAttributes = attributes;
+
+}
+
 void load_OBJ(std::string filename, Data3DPtr data)
 {
     // Open the file
@@ -129,11 +210,28 @@ void load_PLY(std::string filename, Data3DPtr data)
     propNames.erase(std::remove(propNames.begin(), propNames.end(), std::string("y")), propNames.end());
     propNames.erase(std::remove(propNames.begin(), propNames.end(), std::string("z")), propNames.end());
 
+    std::vector<std::string> propListNames;
     for (std::string name : propNames)
     {
-        std::vector<double> propData = plyIn.getElement("vertex").getProperty<double>(name.c_str());
-        data->vertexAttributes[name] = propData;
+        try {
+            std::vector<double> propData = plyIn.getElement("vertex").getProperty<double>(name.c_str());
+            data->vertexAttributes[name] = propData;
+        } catch (const std::runtime_error&) {
+            // property is a list
+            propListNames.push_back(name);
+        }
     }
+
+    // for (std::string name : propListNames)
+    // {
+    //     try {
+    //         std::vector<std::vector<double>> propData = plyIn.getElement("vertex").getListProperty<double>(name.c_str());
+    //         data->vertexVecAttributes[name] = propData;
+    //     } catch (const std::runtime_error&) {
+    //         // property is not even a list
+    //     }
+    // }
+
 
     // Fill in texture coords from attributes
     // has texture coords in s and t
@@ -192,6 +290,9 @@ void loadPolygonSoup(std::string filename, Data3DPtr data)
     } else if (extension == "ply") {
         // polyscope::loadPolygonSoup_PLY(filename, vertices, faceIndicesOut);
         load_PLY(filename, data);
+    } else if (extension == "pts") {
+        // polyscope::loadPolygonSoup_PLY(filename, vertices, faceIndicesOut);
+        load_PTS(filename, data);
     } else {
         polyscope::error("Could not detect file type to load mesh from " + filename);
     }

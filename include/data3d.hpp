@@ -17,6 +17,7 @@ typedef struct Data3D
     std::vector<std::array<double, 2>> textureCoords;
     std::unordered_map<std::string, std::vector<double> > vertexAttributes;
     std::unordered_map<std::string, std::vector<double> > faceAttributes;
+    std::unordered_map<std::string, std::vector<std::array<double, 3>> > vertexVecAttributes;
 
     void set_vertices(std::vector<std::array<double, 3>> &in_vertex)
     {
