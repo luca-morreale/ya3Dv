@@ -18,7 +18,7 @@ std::vector<AnimatedInterpolation> visible_interpolations;
 
 
 void open_file_callback(std::vector<std::string> &files);
-void open_interpolation_callback(std::map<std::string, std::vector<std::string>> &files, std::array<bool, 1000> &selected);
+void open_interpolation_callback(std::vector<std::string> &files);
 void animate_interpolations();
 void set_interpolations_level(float interpolation_factor);
 
@@ -33,7 +33,7 @@ int main(int argc, char** argv)
 
     try {
         parser.ParseCLI(argc, argv);
-        
+
     } catch (const args::Help&) {
         std::cout << parser;
         return 0;
@@ -52,7 +52,7 @@ int main(int argc, char** argv)
     UI::animate_interpolations = animate_interpolations;
     UI::set_interpolations_level = set_interpolations_level;
 
-    
+
     std::vector<std::string> files_list = files.Get();
     if (files_list.size() > 0) {
         open_file_callback(files_list);
@@ -74,16 +74,12 @@ void open_file_callback(std::vector<std::string> &files)
 }
 
 
-void open_interpolation_callback(std::map<std::string, std::vector<std::string>> &files, std::array<bool, 1000> &selected)
+void open_interpolation_callback(std::vector<std::string> &files)
 {
-    int i = 0;
-    for (auto it = files.begin(); it != files.end(); it++) {
-        if (selected[i]) {
-            AnimatedInterpolation obj(it->second, it->first);
-            obj.draw();
-            visible_interpolations.push_back(obj);
-        }
-        i++;
+    for (uint i = 0; i < files.size(); i++) {
+        AnimatedInterpolation obj(files[i]);
+        obj.draw();
+        visible_interpolations.push_back(obj);
     }
 }
 

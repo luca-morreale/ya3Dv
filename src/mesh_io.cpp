@@ -298,3 +298,26 @@ void loadPolygonSoup(std::string filename, Data3DPtr data)
     }
 
 }
+
+std::vector<std::string> read_interpolation_files(std::string &file)
+{
+    std::vector<std::string> files;
+
+    // check file extension is '.interpolation'
+    if(file.substr(file.find_last_of(".") + 1) == "interpolation") {
+        // Open the file
+        std::ifstream in(file);
+        if (!in) throw std::invalid_argument("Could not open mesh file " + file);
+
+        // parse obj format
+        std::string line;
+        // skim through the file
+        while (getline(in, line)) {
+            if (line.size() > 0) {
+                // save every line as different file
+                files.push_back(line);
+            }
+        }
+    }
+    return files;
+}

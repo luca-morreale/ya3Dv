@@ -26,5 +26,7 @@ void load_PLY(std::string filename, Data3DPtr data);
 
 void loadPolygonSoup(std::string filename, Data3DPtr data);
 
+std::vector<std::string> read_interpolation_files(std::string &file);
+
 
 #endif // LOAD_OBJ_HPP_

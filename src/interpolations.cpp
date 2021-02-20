@@ -2,8 +2,11 @@
 #include "interpolations.hpp"
 
 
-AnimatedInterpolation::AnimatedInterpolation(std::vector<std::string> files, std::string name)
+AnimatedInterpolation::AnimatedInterpolation(std::string &interpolation_file)
 {
+    std::vector<std::string> files = read_interpolation_files(interpolation_file);
+    std::string name = files[0];
+    files.erase(files.begin());
     this->set_meshes(files, name);
     this->go_up();
 }
@@ -84,11 +87,12 @@ void AnimatedInterpolation::update_increment()
     this->reset_wait_step();
 }
 
-void AnimatedInterpolation::set_meshes(std::vector<std::string> files, std::string name)
+void AnimatedInterpolation::set_meshes(std::vector<std::string> &files, std::string &name)
 {
     for (uint i = 0; i < files.size(); i++) {
         std::string file = files[i];
         this->meshes.push_back(Object3D(file, name));
+        std::cout << file << std::endl;
     }
 
     auto rand_colors = this->meshes[0].get_faces_random_colors();

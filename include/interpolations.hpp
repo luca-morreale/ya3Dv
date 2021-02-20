@@ -4,16 +4,17 @@
 #include <vector>
 
 #include "object_3d.hpp"
+#include "mesh_io.hpp"
 
 class AnimatedInterpolation {
 public:
-    AnimatedInterpolation(std::vector<std::string> files, std::string name);
+    AnimatedInterpolation(std::string &interpolation_file);
     ~AnimatedInterpolation();
 
     void draw();
     void animate();
 
-    void set_meshes(std::vector<std::string> files, std::string name);
+    void set_meshes(std::vector<std::string> &files, std::string &name);
     void set_active(int index);
 
     void set_interpolation_factor(float interpolation_factor);
