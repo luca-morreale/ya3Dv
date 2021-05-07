@@ -1,6 +1,7 @@
 
 #include "interpolations.hpp"
 
+int AnimatedInterpolation::MAX_WAIT_STEPS = 7;
 
 AnimatedInterpolation::AnimatedInterpolation(std::string &interpolation_file)
 {
@@ -52,7 +53,7 @@ void AnimatedInterpolation::wait()
 
 bool AnimatedInterpolation::has_waited_enough()
 {
-    return this->wait_step == MAX_WAIT_STEPS;
+    return this->wait_step == AnimatedInterpolation::MAX_WAIT_STEPS;
 }
 
 void AnimatedInterpolation::go_down()
@@ -92,7 +93,6 @@ void AnimatedInterpolation::set_meshes(std::vector<std::string> &files, std::str
     for (uint i = 0; i < files.size(); i++) {
         std::string file = files[i];
         this->meshes.push_back(Object3D(file, name));
-        std::cout << file << std::endl;
     }
 
     auto rand_colors = this->meshes[0].get_faces_random_colors();

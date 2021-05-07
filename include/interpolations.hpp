@@ -19,6 +19,8 @@ public:
 
     void set_interpolation_factor(float interpolation_factor);
 
+    static int MAX_WAIT_STEPS;
+
 protected:
     void wait();
     bool has_waited_enough();
@@ -35,7 +37,6 @@ private:
     int current_active;
     int increment;
 
-    int MAX_WAIT_STEPS = 5;
     int wait_step = 0;
 
 };
