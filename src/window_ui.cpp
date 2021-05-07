@@ -69,6 +69,10 @@ namespace UI {
         if (ImGui::Button("Stop")) {
             animate = false;
         }
+        ImGui::SameLine();
+
+        ImGui::SetNextItemWidth(100);
+        ImGui::InputInt("Animation Hz", &AnimatedInterpolation::MAX_WAIT_STEPS, 1, 5);
     }
 
 

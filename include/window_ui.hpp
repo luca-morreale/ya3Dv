@@ -6,6 +6,8 @@
 
 #include <polyscope/polyscope.h>
 
+#include "interpolations.hpp"
+
 #include <vector>
 #include <array>
 #include <map>
