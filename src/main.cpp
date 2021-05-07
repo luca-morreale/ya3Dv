@@ -27,9 +27,9 @@ int main(int argc, char** argv)
 {
     // parse args
     args::ArgumentParser parser("Visualizer for 3D meshes and point cloud.");
+    args::PositionalList<std::string> meshes(parser, "mesh", "One or more files to visualize");
     args::HelpFlag help(parser, "help", "Display this help menu", {'h', "help"});
-    args::PositionalList<std::string> files(parser, "files", "One or more files to visualize");
-    // args::Flag conformal(parser, "conformal", "Compute conformal measure", {'c', "conformal"});
+    args::ValueFlagList<std::string> interps(parser, "interpolation", "One or more interpolations to visualize", {'i', "interp"});
 
     try {
         parser.ParseCLI(argc, argv);
@@ -44,6 +44,7 @@ int main(int argc, char** argv)
     }
 
     // visualization
+    polyscope::view::upDir = polyscope::view::UpDir::ZUp;
     polyscope::init();
 
     polyscope::state::userCallback = UI::callback;
@@ -53,9 +54,13 @@ int main(int argc, char** argv)
     UI::set_interpolations_level = set_interpolations_level;
 
 
-    std::vector<std::string> files_list = files.Get();
-    if (files_list.size() > 0) {
-        open_file_callback(files_list);
+    std::vector<std::string> meshes_list = meshes.Get();
+    if (meshes_list.size() > 0) {
+        open_file_callback(meshes_list);
+    }
+    std::vector<std::string> interps_list = interps.Get();
+    if (interps_list.size() > 0) {
+        open_interpolation_callback(interps_list);
     }
 
     polyscope::show();
