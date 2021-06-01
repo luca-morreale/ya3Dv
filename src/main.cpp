@@ -44,7 +44,7 @@ int main(int argc, char** argv)
     }
 
     // visualization
-    polyscope::view::upDir = polyscope::view::UpDir::ZUp;
+    polyscope::view::upDir = polyscope::view::UpDir::YUp;
     polyscope::init();
 
     polyscope::state::userCallback = UI::callback;
