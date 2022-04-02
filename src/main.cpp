@@ -43,8 +43,12 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    polyscope::options::programName = "ya3Dv";
+
     // visualization
     polyscope::view::upDir = polyscope::view::UpDir::YUp;
+    polyscope::view::style = polyscope::view::NavigateStyle::Free;
+    polyscope::options::groundPlaneMode = polyscope::GroundPlaneMode::None;
     polyscope::init();
 
     polyscope::state::userCallback = UI::callback;
